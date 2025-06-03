@@ -2,7 +2,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Text, useTheme as usePaperTheme } from 'react-native-paper';
-import { useTheme } from './src/theme/ThemeContext';
+import { useTheme } from './src/context/ThemeContext';
 
 const SettingsScreen = () => {
   const { themeMode, setTheme } = useTheme();

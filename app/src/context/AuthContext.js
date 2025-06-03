@@ -18,14 +18,15 @@ export const AuthProvider = ({ children }) => {
         const accessToken = await AsyncStorage.getItem('access_token');
         if (accessToken) {
           // Fetch user data
-          const response = await axiosInstance.post('/user/', accessToken);
-          console.log('User data response:', response.data);
-          setUser(response.data[0]); // Adjust based on your API response
+          const response = await axiosInstance.get('/user/', {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+          setUser(response.data[0]);
           setIsAuthenticated(true);
         }
       } catch (error) {
-        //console.log('Error checking auth:', response.data);
-        console.error('Error checking auth:', error);
       } finally {
         setIsLoading(false);
       }
@@ -42,21 +43,21 @@ export const AuthProvider = ({ children }) => {
       });
       await AsyncStorage.setItem('access_token', response.data.access);
       await AsyncStorage.setItem('refresh_token', response.data.refresh);
-      console.log('Login response ape:', response.data);
-      console.log('Access Token:', response.data.access);
-      
-      const userResponse = await axiosInstance.post('/user/', response.data.access);
-      console.log(userResponse);
-      // Fetch user data after login);
-      console.log('User response:', userResponse.data);
-      //setUser(userResponse.data[0]); // Adjust based on your API response
+
+      const userResponse = await axiosInstance.get('/user/', {
+        headers: {
+          Authorization: `Bearer ${response.data.access}`,
+        },
+      });
+
+      setUser(userResponse.data[0]);
       setIsAuthenticated(true);
       router.replace('/home');
     } catch (error) {
       Toast.show({
         type: 'error',
         text1: 'Login Failed',
-        text2: error.response?.data?.detail || 'Invalid credentials.',
+        text2: error.response.data || 'Invalid credentials.',
       });
       throw error;
     }
@@ -91,7 +92,9 @@ export const AuthProvider = ({ children }) => {
     try {
       const refreshToken = await AsyncStorage.getItem('refresh_token');
       if (refreshToken) {
-        await axiosInstance.post('token/blacklist/', { refresh: refreshToken });
+        await axiosInstance.post('token/blacklist/', {
+          refresh_token: refreshToken,
+        });
       }
       await AsyncStorage.removeItem('access_token');
       await AsyncStorage.removeItem('refresh_token');
@@ -99,7 +102,7 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       router.replace('/auth');
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error('Logout failed:', error.message);
       Toast.show({
         type: 'error',
         text1: 'Logout Failed',
@@ -118,4 +121,4 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
-export default useAuth
+export default useAuth;

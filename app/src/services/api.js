@@ -3,7 +3,7 @@ import axios from 'axios';
 import { router } from 'expo-router';
 import Toast from 'react-native-toast-message';
 
-const baseURL = 'http://192.168.106.126:8000/';
+const baseURL = 'http://10.20.30.202:8000/';
 
 const axiosInstance = axios.create({
   baseURL,
@@ -26,7 +26,7 @@ axiosInstance.interceptors.request.use(
   async (config) => {
     const token = await AsyncStorage.getItem('access_token');
     if (token) {
-      config.headers['Authorization'] = `JWT ${token}`;
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
   },
@@ -65,7 +65,7 @@ axiosInstance.interceptors.response.use(
       if (isRefreshing) {
         return new Promise((resolve) => {
           refreshSubscribers.push((accessToken) => {
-            originalRequest.headers['Authorization'] = `JWT ${accessToken}`;
+            originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
             resolve(axiosInstance(originalRequest));
           });
         });
@@ -102,7 +102,7 @@ axiosInstance.interceptors.response.use(
           await AsyncStorage.setItem('refresh_token', response.data.refresh);
           axiosInstance.defaults.headers[
             'Authorization'
-          ] = `JWT ${response.data.access}`;
+          ] = `Bearer ${response.data.access}`;
           onRefreshed(response.data.access);
           isRefreshing = false;
           return axiosInstance(originalRequest);

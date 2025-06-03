@@ -15,8 +15,8 @@ export default function HomeScreen() {
 
   const fetchProtectedData = async () => {
     try {
-      const response = await axiosInstance.get('/protected-endpoint/');
-      console.log('Protected data:', response.data);
+      const response = await axiosInstance.get('/user/');
+      console.log('Protected data:', response.data[0]);
     } catch (error) {
       console.error('Error fetching protected data:', error);
     }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { ActivityIndicator, Button, Text, TextInput } from 'react-native-paper';
+import Toast from 'react-native-toast-message';
 import { useAuth } from './src/context/AuthContext';
 
 export default function AuthScreen() {
@@ -9,8 +10,7 @@ export default function AuthScreen() {
   const [password2, setPassword2] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isLogin, setIsLogin] = useState<boolean>(false);
-  const { login } = useAuth();
-  const { register } = useAuth(); // Uncomment if you implement registration logic
+  const { login, register } = useAuth();
   const handleToggleLogin = () => {
     setIsLogin((prev) => !prev);
   };
@@ -30,17 +30,40 @@ export default function AuthScreen() {
     setIsLoading(true);
     try {
       await register(email, password, password2);
-      // Implement your registration logic here
-      // For example, you might call an API to create a new user
-      // await register(email, password, password2);
-      console.log('Registration logic not implemented yet');
     } catch (error) {
       // Error handled by Toast in AuthContext
     } finally {
       setIsLoading(false);
     }
   };
-  
+
+  const isFormValid = () => {
+    if (!email || !password) {
+      Toast.show({
+        type: 'error',
+        text1: 'Invalid Email',
+        text2: 'Please enter a valid email address.',
+      });
+      return false;
+    }
+    if (!isLogin && (!password2 || password !== password2)) {
+      Toast.show({
+        type: 'error',
+        text1: 'Passwords Do Not Match',
+        text2: 'Please make sure both passwords match.',
+      });
+      return false;
+    }
+    if (password.length < 8) {
+      Toast.show({
+        type: 'error',
+        text1: 'Password Too Short',
+        text2: 'Password must be at least 8 characters.',
+      });
+      return false;
+    }
+    return true;
+  };
 
   return (
     <KeyboardAvoidingView
@@ -77,14 +100,22 @@ export default function AuthScreen() {
             mode='outlined'
           />
         ) : null}
-        <Button 
-          mode='contained'  
+        <Button
+          mode='contained'
           disabled={isLoading}
-          onPress={isLogin ? handleLogin : handleRegistration}
-          >
-            {isLogin ? 'Login' : 'Sign Up'}
-          </Button>
-        {isLoading && <ActivityIndicator size="large" />}
+          onPress={
+            isLogin
+              ? () => {
+                  if (isFormValid()) handleLogin();
+                }
+              : () => {
+                  if (isFormValid()) handleRegistration();
+                }
+          }
+        >
+          {isLogin ? 'Login' : 'Sign Up'}
+        </Button>
+        {isLoading && <ActivityIndicator size='large' />}
 
         <Button mode='text' onPress={handleToggleLogin}>
           {!isLogin
