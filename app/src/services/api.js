@@ -3,7 +3,7 @@ import axios from 'axios';
 import { router } from 'expo-router';
 import Toast from 'react-native-toast-message';
 
-const baseURL = 'http://10.20.30.202:8000/';
+const baseURL = 'http://192.168.106.126:8000/';
 
 const axiosInstance = axios.create({
   baseURL,

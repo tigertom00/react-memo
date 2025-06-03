@@ -1,8 +1,8 @@
 import { router } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Button, Text, View } from 'react-native';
-import { useAuth } from './context/AuthContext';
-import axiosInstance from './src/axios';
+import { useAuth } from './src/context/AuthContext';
+import axiosInstance from './src/services/api';
 
 export default function HomeScreen() {
   const { isAuthenticated, isLoading, logout } = useAuth();

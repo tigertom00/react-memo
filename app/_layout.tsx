@@ -1,13 +1,17 @@
 import { Stack } from 'expo-router';
-import { ThemeProvider } from './theme/ThemeContext';
+import Toast from 'react-native-toast-message';
+import { AuthProvider } from './src/context/AuthContext';
 export default function RootLayout() {
   return (
-    <ThemeProvider>
+    <AuthProvider>
+    
       <Stack>
         <Stack.Screen name='index' options={{ headerShown: false }} />
         <Stack.Screen name='settings' options={{ headerShown: false }} />
         <Stack.Screen name='auth' options={{ headerShown: false }} />
       </Stack>
-    </ThemeProvider>
+    
+    <Toast />
+    </AuthProvider>
   );
 }
